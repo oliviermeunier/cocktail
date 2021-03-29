@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - {{ cocktail.name }} !{% endblock %}
+
+{% block body %}
+
+    <!-- Affichage du détail du cocktail -->
+
+    <h2>{{ cocktail.name }}</h2>
+    <span class="badge bg-secondary">{{ cocktail.category.label }}</span>
+    <p class="lead">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</p>
+    <img class="img-fluid" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
+    <p>{{ cocktail.recipe }}</p>
+
+{% endblock %}

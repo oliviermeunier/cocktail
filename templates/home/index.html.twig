@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - Bienvenue !{% endblock %}
+
+{% block body %}
+
+    {# Code HTML spécifique à la page d'accueil #}
+
+    <h2>Nos cocktails</h2>
+    <div class="row">
+        {% for cocktail in cocktails %}
+            <div class="mb-4 col-xl-3">
+                <div class="card">
+                    <img class="card-img-top" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
+                    <div class="card-body">
+                        <h3 class="card-title">{{ cocktail.name }}</h3>
+                        <a href="{{ path('cocktail.index', {'id':cocktail.id}) }}" class="btn btn-primary stretched-link">Voir la recette</a>
+                    </div>
+                    <div class="card-footer text-muted">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
