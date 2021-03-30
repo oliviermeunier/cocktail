@@ -4,6 +4,7 @@ namespace App\Factory;
 
 use App\Entity\Cocktail;
 use App\Repository\CocktailRepository;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
@@ -26,11 +27,16 @@ use Zenstruck\Foundry\Proxy;
  */
 final class CocktailFactory extends ModelFactory
 {
-    public function __construct()
+    /**
+     * @var SluggerInterface
+     */
+    private $slugger;
+
+    public function __construct(SluggerInterface $slugger)
     {
         parent::__construct();
 
-        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+        $this->slugger = $slugger;
     }
 
     protected function getDefaults(): array
@@ -48,7 +54,10 @@ final class CocktailFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return $this
-            // ->afterInstantiate(function(Cocktail $cocktail) {})
+             ->afterInstantiate(function(Cocktail $cocktail) {
+                 $slug = $this->slugger->slug($cocktail->getName());
+                 $cocktail->setSlug($slug);
+             })
         ;
     }
 
