@@ -8,21 +8,27 @@
 
     <h2>Nos cocktails</h2>
 
-    <form>
-        <div>
-            <label for="category">Catégorie</label>
-            <select name="category" id="category">
-                {% for category in categories %}
-                    <option value="{{ category.id }}">{{ category.label }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div>
-            <label for="created-at-min">Créé à partir de </label>
-            <input type="date" name="created-at-min" id="created-at-min">
-        </div>
-        <input type="submit" value="Filtrer">
-    </form>
+{#    <form>#}
+{#        <div>#}
+{#            <label for="category">Catégorie</label>#}
+{#            <select name="category" id="category">#}
+{#                {% for category in categories %}#}
+{#                    <option value="{{ category.id }}">{{ category.label }}</option>#}
+{#                {% endfor %}#}
+{#            </select>#}
+{#        </div>#}
+{#        <div>#}
+{#            <label for="created-at-min">Créé à partir de </label>#}
+{#            <input type="date" name="created-at-min" id="created-at-min">#}
+{#        </div>#}
+{#        <input type="submit" value="Filtrer">#}
+{#    </form>#}
+
+    <section class="my-3">
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </section>
 
     <div class="row">
         {% for cocktail in cocktails %}
@@ -31,6 +37,7 @@
                     <img class="card-img-top" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
                     <div class="card-body">
                         <h3 class="card-title">{{ cocktail.name }}</h3>
+                        <span class="badge bg-secondary">{{ cocktail.category.label }}</span>
                         <a href="{{ path('cocktail.index', {'slug':cocktail.slug}) }}" class="btn btn-primary stretched-link">Voir la recette</a>
                     </div>
                     <div class="card-footer text-muted">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</div>
