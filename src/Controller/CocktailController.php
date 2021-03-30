@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class CocktailController extends AbstractController
 {
     /**
-     * @Route("/cocktail/{id}", name="cocktail.index")
+     * @Route("/cocktail/{slug}", name="cocktail.index")
      */
     public function index(Cocktail $cocktail): Response
     {

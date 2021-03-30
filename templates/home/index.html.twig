@@ -14,7 +14,7 @@
                     <img class="card-img-top" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
                     <div class="card-body">
                         <h3 class="card-title">{{ cocktail.name }}</h3>
-                        <a href="{{ path('cocktail.index', {'id':cocktail.id}) }}" class="btn btn-primary stretched-link">Voir la recette</a>
+                        <a href="{{ path('cocktail.index', {'slug':cocktail.slug}) }}" class="btn btn-primary stretched-link">Voir la recette</a>
                     </div>
                     <div class="card-footer text-muted">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</div>
                 </div>
