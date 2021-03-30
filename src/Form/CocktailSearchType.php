@@ -23,7 +23,9 @@ class CocktailSearchType extends AbstractType
                     return $categoryRepository->createQueryBuilder('c')
                                 ->orderBy('c.label', 'ASC');
                 },
-                'label' => 'Catégorie'
+                'label' => 'Catégorie',
+                'placeholder' => 'Toutes les catégories',
+                'required' => false
             ])
             ->add('created_at_min', DateType::class, [
                 'widget' => 'single_text',
