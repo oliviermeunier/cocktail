@@ -19,6 +19,26 @@ class CocktailRepository extends ServiceEntityRepository
         parent::__construct($registry, Cocktail::class);
     }
 
+    public function search($category, $createdAtMin)
+    {
+        $queryBuilder = $this->createQueryBuilder('c');
+
+        if ($category) {
+            $queryBuilder->andWhere('c.category = :category')
+                         ->setParameter('category', $category);
+        }
+
+        if ($createdAtMin) {
+            $queryBuilder->andWhere('c.createdAt >= :created_at_min')
+                         ->setParameter('created_at_min', $createdAtMin);
+        }
+
+        return $queryBuilder
+                    ->orderBy('c.createdAt', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+    }
+
     // /**
     //  * @return Cocktail[] Returns an array of Cocktail objects
     //  */

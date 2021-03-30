@@ -7,6 +7,23 @@
     {# Code HTML spécifique à la page d'accueil #}
 
     <h2>Nos cocktails</h2>
+
+    <form>
+        <div>
+            <label for="category">Catégorie</label>
+            <select name="category" id="category">
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="created-at-min">Créé à partir de </label>
+            <input type="date" name="created-at-min" id="created-at-min">
+        </div>
+        <input type="submit" value="Filtrer">
+    </form>
+
     <div class="row">
         {% for cocktail in cocktails %}
             <div class="mb-4 col-xl-3">
