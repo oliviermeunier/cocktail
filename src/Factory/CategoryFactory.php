@@ -36,7 +36,7 @@ final class CategoryFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'label' => implode(' ', self::faker()->words(2))
+            'label' => implode(' ', self::faker()->unique()->words(2))
         ];
     }
 

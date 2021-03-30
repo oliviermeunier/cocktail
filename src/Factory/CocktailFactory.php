@@ -42,7 +42,7 @@ final class CocktailFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'name' => self::faker()->sentence(3),
+            'name' => self::faker()->unique()->sentence(3),
             'recipe' => self::faker()->text(500),
             'createdAt' => self::faker()->dateTimeBetween('-3 years'),
             'category' => CategoryFactory::random(),
