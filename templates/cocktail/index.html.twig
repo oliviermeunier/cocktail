@@ -2,6 +2,11 @@
 
 {% block title %}{{ parent() }} - {{ cocktail.name }} !{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script defer src="{{ asset('js/cocktail.js') }}"></script>
+{% endblock %}
+
 {% block body %}
 
     <!-- Affichage du détail du cocktail -->
@@ -11,5 +16,30 @@
     <p class="lead">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</p>
     <img class="img-fluid" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
     <p>{{ cocktail.recipe }}</p>
+
+    <section>
+        <h3>Commentaires</h3>
+
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+        {% else %}
+            <p><a href="{{ path('security.login') }}">Connectez-vous</a> ou <a href="{{ path('user.signup') }}">enregistrez-vous</a> pour ajouter un commentaire !</p>
+        {% endif %}
+
+        {% if cocktail.comments %}
+            <ul>
+                {% for comment in cocktail.comments %}
+                    <li>
+                        <h4>Ajouté par {{ comment.user.fullname }} [{{ comment.createdAt|date('d/m/Y à H:i') }}]</h4>
+                        <p>{{ comment.content }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Soyez le premier à commenter ce cocktail !</p>
+        {% endif %}
+    </section>
 
 {% endblock %}
