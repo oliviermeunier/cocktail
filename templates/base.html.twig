@@ -27,6 +27,10 @@
         {{ include('partials/_nav.html.twig') }}
 
         <main class="container mt-5">
+
+            {# Messages flash #}
+            {{ include('partials/_flash.html.twig') }}
+
             {% block body %}{% endblock %}
         </main>
     </body>

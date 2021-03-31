@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - Créez votre compte ! {% endblock %}
+
+{% block body %}
+
+    <h2>Enregistrez-vous</h2>
+
+    <section>
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </section>
+
+{% endblock %}

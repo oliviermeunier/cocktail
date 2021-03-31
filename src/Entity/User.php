@@ -5,9 +5,16 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(
+ *     fields={"email"},
+ *     message="Il existe déjà un compte avec cette adresse mail"
+ * )
  */
 class User implements UserInterface
 {
@@ -20,6 +27,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank(message="Le champ Email est obligatoire")
+     * @Assert\Email(message="Le champ Email est incorrect")
      */
     private $email;
 
@@ -36,13 +45,20 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Le champ Prénom est obligatoire")
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Le champ Nom est obligatoire")
      */
     private $lastname;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
 
     public function getId(): ?int
     {
@@ -147,5 +163,27 @@ class User implements UserInterface
         $this->lastname = $lastname;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedAtValue(): void
+    {
+        if (!$this->createdAt) {
+            $this->createdAt = new \DateTimeImmutable();
+        }
     }
 }
