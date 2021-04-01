@@ -15,7 +15,8 @@ class CommentType extends AbstractType
     {
         $builder
             ->add('content', TextareaType::class, [
-                'label' => 'Votre commentaire'
+                'label' => 'Votre commentaire',
+                'required' => false
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Valider'

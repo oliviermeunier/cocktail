@@ -29,12 +29,9 @@
         {% endif %}
 
         {% if cocktail.comments %}
-            <ul>
+            <ul id="comments-list">
                 {% for comment in cocktail.comments %}
-                    <li>
-                        <h4>Ajouté par {{ comment.user.fullname }} [{{ comment.createdAt|date('d/m/Y à H:i') }}]</h4>
-                        <p>{{ comment.content }}</p>
-                    </li>
+                    {{ include('partials/_comment.html.twig') }}
                 {% endfor %}
             </ul>
         {% else %}
