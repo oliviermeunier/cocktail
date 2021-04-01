@@ -34,7 +34,7 @@ class CocktailRepository extends ServiceEntityRepository
         }
 
         return $queryBuilder
-                    ->orderBy('c.createdAt', 'ASC')
+                    ->orderBy('c.createdAt', 'DESC')
                     ->getQuery()
                     ->getResult();
     }

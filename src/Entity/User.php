@@ -67,9 +67,15 @@ class User implements UserInterface
      */
     private $comments;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Cocktail::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $cocktails;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->cocktails = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -228,6 +234,36 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($comment->getUser() === $this) {
                 $comment->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Cocktail[]
+     */
+    public function getCocktails(): Collection
+    {
+        return $this->cocktails;
+    }
+
+    public function addCocktail(Cocktail $cocktail): self
+    {
+        if (!$this->cocktails->contains($cocktail)) {
+            $this->cocktails[] = $cocktail;
+            $cocktail->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCocktail(Cocktail $cocktail): self
+    {
+        if ($this->cocktails->removeElement($cocktail)) {
+            // set the owning side to null (unless already changed)
+            if ($cocktail->getUser() === $this) {
+                $cocktail->setUser(null);
             }
         }
 

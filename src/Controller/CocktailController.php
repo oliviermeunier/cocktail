@@ -3,22 +3,35 @@
 namespace App\Controller;
 
 use App\Entity\Cocktail;
+use App\Form\CocktailType;
 use App\Form\CommentType;
 use App\Repository\CocktailRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CocktailController extends AbstractController
 {
     /**
-     * @Route("/cocktail/{slug}", name="cocktail.index")
+     * @var EntityManagerInterface
      */
-    public function index(Cocktail $cocktail, Request $request, EntityManagerInterface $manager): Response
+    private $manager;
+
+    public function __construct(EntityManagerInterface $manager)
+    {
+        $this->manager = $manager;
+    }
+
+    /**
+     * @Route("/coktail-{slug}", name="cocktail.index")
+     */
+    public function index(Cocktail $cocktail, Request $request): Response
     {
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
@@ -29,8 +42,8 @@ class CocktailController extends AbstractController
             $comment->setUser($this->getUser());
             $comment->setCocktail($cocktail);
 
-            $manager->persist($comment);
-            $manager->flush();
+            $this->manager->persist($comment);
+            $this->manager->flush();
 
             $this->addFlash('success', 'Votre commentaire a bien été pris en compte.');
             return $this->redirectToRoute('cocktail.index', ['slug' => $cocktail->getSlug()]);
@@ -45,7 +58,7 @@ class CocktailController extends AbstractController
     /**
      * @Route("/ajax/cocktail/{slug}", name="cocktail.ajaxAddComment", methods={"POST"})
      */
-    public function ajaxAddComment(Cocktail $cocktail, Request $request, EntityManagerInterface $manager, ValidatorInterface $validator)
+    public function ajaxAddComment(Cocktail $cocktail, Request $request, ValidatorInterface $validator)
     {
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
@@ -57,8 +70,8 @@ class CocktailController extends AbstractController
             $comment->setUser($this->getUser());
             $comment->setCocktail($cocktail);
 
-            $manager->persist($comment);
-            $manager->flush();
+            $this->manager->persist($comment);
+            $this->manager->flush();
 
             // Retourner les données du commentaire ajouté en JSON
             $htmlComment = $this->renderView('partials/_comment.html.twig', ['comment' => $comment]);
@@ -85,4 +98,49 @@ class CocktailController extends AbstractController
             'errors' => $errors
         ]);
     }
+
+    /**
+     * @Route("/cocktail/new", name="cocktail.new")
+     * @return Response
+     */
+    public function new(Request $request, SluggerInterface $slugger, string $uploadsBaseDir): Response
+    {
+        $form = $this->createForm(CocktailType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $cocktail = $form->getData();
+            $cocktail->setUser($this->getUser());
+            $cocktail->setSlug($slugger->slug($cocktail->getName()));
+
+            /**
+             * @var UploadedFile
+             */
+            $uploadedFile = $form->get('imageFile')->getData();
+
+            if ($uploadedFile) {
+
+                // Copie du fichier temporaire vers le répertoire de destination : uploads
+                $filename = sha1(uniqid()) . '.' . $uploadedFile->guessClientExtension();
+                $uploadedFile->move($uploadsBaseDir, $filename);
+
+                // $this->getParameter('uploads_base_dir')
+
+                // Enregistrement du nom du fichier dans l'entité
+                $cocktail->setImage($filename);
+            }
+
+            $this->manager->persist($cocktail);
+            $this->manager->flush();
+
+            $this->addFlash('success', 'Votre cocktail a bien été ajouté.');
+            return $this->redirectToRoute('home.index');
+        }
+
+        return $this->render('cocktail/new.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
 }

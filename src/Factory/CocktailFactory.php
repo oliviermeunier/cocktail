@@ -46,7 +46,8 @@ final class CocktailFactory extends ModelFactory
             'recipe' => self::faker()->text(500),
             'createdAt' => self::faker()->dateTimeBetween('-3 years'),
             'category' => CategoryFactory::random(),
-            'image' => 'https://picsum.photos/seed/' . rand(0,500) . '/750/300'
+            'image' => 'https://picsum.photos/seed/' . rand(0,500) . '/750/300',
+            'user' => UserFactory::random()
         ];
     }
 

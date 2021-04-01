@@ -34,7 +34,9 @@
         {% for cocktail in cocktails %}
             <div class="mb-4 col-xl-3">
                 <div class="card">
-                    <img class="card-img-top" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
+                    {% if cocktail.image %}
+                        <img class="card-img-top" src="{{ asset_uploads(cocktail.image) }}" alt="{{ cocktail.name }}">
+                    {% endif %}
                     <div class="card-body">
                         <h3 class="card-title">{{ cocktail.name }}</h3>
                         <span class="badge bg-secondary">{{ cocktail.category.label }}</span>
