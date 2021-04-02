@@ -14,7 +14,9 @@
     <h2>{{ cocktail.name }}</h2>
     <span class="badge bg-secondary">{{ cocktail.category.label }}</span>
     <p class="lead">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</p>
-    <img class="img-fluid" src="{{ cocktail.image }}" alt="{{ cocktail.name }}">
+    {% if cocktail.image %}
+        <img class="img-fluid" src="{{ asset_uploads(cocktail.image) }}" alt="{{ cocktail.name }}">
+    {% endif %}
     <p>{{ cocktail.recipe }}</p>
 
     <section>

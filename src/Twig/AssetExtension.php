@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Service\UploaderHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -9,24 +10,14 @@ use Twig\TwigFunction;
 class AssetExtension extends AbstractExtension
 {
     /**
-     * @var string
+     * @var UploaderHelper
      */
-    private $uploadsBaseUrl;
+    private $uploaderHelper;
 
-    public function __construct(string $uploadsBaseUrl)
+    public function __construct(UploaderHelper $uploaderHelper)
     {
-        $this->uploadsBaseUrl = $uploadsBaseUrl;
+        $this->uploaderHelper = $uploaderHelper;
     }
-
-//    public function getFilters(): array
-//    {
-//        return [
-//            // If your filter generates SAFE HTML, you should add a third
-//            // parameter: ['is_safe' => ['html']]
-//            // Reference: https://twig.symfony.com/doc/2.x/advanced.html#automatic-escaping
-//            new TwigFilter('filter_name', [$this, 'doSomething']),
-//        ];
-//    }
 
     public function getFunctions(): array
     {
@@ -37,6 +28,6 @@ class AssetExtension extends AbstractExtension
 
     public function assetUploads(string $filename)
     {
-        return $this->uploadsBaseUrl . '/' . $filename;
+        return $this->uploaderHelper->assetUploadUrl($filename);
     }
 }

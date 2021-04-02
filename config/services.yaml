@@ -6,7 +6,7 @@
 parameters:
     uploads_dir_name: 'uploads'
     uploads_base_dir: '%kernel.project_dir%/public/%uploads_dir_name%'
-    uploads_base_url: '%uploads_dir_name%'
+    uploads_base_url: '%env(SITE_BASE_URL)%/%uploads_dir_name%'
 services:
     # default configuration for services in *this* file
     _defaults:

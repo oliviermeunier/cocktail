@@ -6,8 +6,11 @@ use App\Entity\Cocktail;
 use App\Form\CocktailType;
 use App\Form\CommentType;
 use App\Repository\CocktailRepository;
+use App\Service\CocktailUploaderHelper;
+use App\Service\UploaderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -103,7 +106,7 @@ class CocktailController extends AbstractController
      * @Route("/cocktail/new", name="cocktail.new")
      * @return Response
      */
-    public function new(Request $request, SluggerInterface $slugger, string $uploadsBaseDir): Response
+    public function new(Request $request, SluggerInterface $slugger, CocktailUploaderHelper $uploaderHelper): Response
     {
         $form = $this->createForm(CocktailType::class);
         $form->handleRequest($request);
@@ -114,22 +117,8 @@ class CocktailController extends AbstractController
             $cocktail->setUser($this->getUser());
             $cocktail->setSlug($slugger->slug($cocktail->getName()));
 
-            /**
-             * @var UploadedFile
-             */
-            $uploadedFile = $form->get('imageFile')->getData();
-
-            if ($uploadedFile) {
-
-                // Copie du fichier temporaire vers le répertoire de destination : uploads
-                $filename = sha1(uniqid()) . '.' . $uploadedFile->guessClientExtension();
-                $uploadedFile->move($uploadsBaseDir, $filename);
-
-                // $this->getParameter('uploads_base_dir')
-
-                // Enregistrement du nom du fichier dans l'entité
-                $cocktail->setImage($filename);
-            }
+            // Gestion du fichier image par le service CocktailUploaderHelper
+            $uploaderHelper->uploadCocktailImage($form->get('imageFile')->getData(), $cocktail);
 
             $this->manager->persist($cocktail);
             $this->manager->flush();

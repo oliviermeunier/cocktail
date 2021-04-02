@@ -4,6 +4,9 @@ namespace App\Factory;
 
 use App\Entity\Cocktail;
 use App\Repository\CocktailRepository;
+use App\Service\CocktailUploaderHelper;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\ModelFactory;
@@ -32,11 +35,36 @@ final class CocktailFactory extends ModelFactory
      */
     private $slugger;
 
-    public function __construct(SluggerInterface $slugger)
+    private $images = [
+        'cocktail1.jpg',
+        'cocktail2.jpg',
+        'cocktail3.jpg',
+        'cocktail4.jpg',
+        'cocktail5.jpg',
+        'cocktail6.jpg',
+        'cocktail7.jpg',
+        'cocktail8.jpg',
+        'cocktail9.jpg',
+        'cocktail10.jpg',
+    ];
+
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var CocktailUploaderHelper
+     */
+    private $uploaderHelper;
+
+    public function __construct(SluggerInterface $slugger, Filesystem $filesystem, CocktailUploaderHelper $uploaderHelper)
     {
         parent::__construct();
 
         $this->slugger = $slugger;
+        $this->filesystem = $filesystem;
+        $this->uploaderHelper = $uploaderHelper;
     }
 
     protected function getDefaults(): array
@@ -46,7 +74,7 @@ final class CocktailFactory extends ModelFactory
             'recipe' => self::faker()->text(500),
             'createdAt' => self::faker()->dateTimeBetween('-3 years'),
             'category' => CategoryFactory::random(),
-            'image' => 'https://picsum.photos/seed/' . rand(0,500) . '/750/300',
+            'image' => self::faker()->randomElement($this->images),
             'user' => UserFactory::random()
         ];
     }
@@ -56,8 +84,16 @@ final class CocktailFactory extends ModelFactory
         // see https://github.com/zenstruck/foundry#initialization
         return $this
              ->afterInstantiate(function(Cocktail $cocktail) {
-                 $slug = $this->slugger->slug($cocktail->getName());
-                 $cocktail->setSlug($slug);
+
+                 // Slugification du nom du cocktail
+                 $cocktail->setSlug($this->slugger->slug($cocktail->getName()));
+
+                 // Upload de l'image
+                 $source = __DIR__ . '/images/' . $cocktail->getImage();
+                 $dest = sys_get_temp_dir() . $cocktail->getImage();
+                 $this->filesystem->copy($source, $dest);
+
+                 $this->uploaderHelper->uploadCocktailImage(new File($dest), $cocktail);
              })
         ;
     }
