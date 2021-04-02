@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -32,7 +33,7 @@ class CocktailController extends AbstractController
     }
 
     /**
-     * @Route("/coktail-{slug}", name="cocktail.index")
+     * @Route("/cocktail-{slug}", name="cocktail.index")
      */
     public function index(Cocktail $cocktail, Request $request): Response
     {
@@ -124,7 +125,7 @@ class CocktailController extends AbstractController
             $this->manager->flush();
 
             $this->addFlash('success', 'Votre cocktail a bien été ajouté.');
-            return $this->redirectToRoute('home.index');
+            return $this->redirectToRoute('cocktail.listUserCocktails');
         }
 
         return $this->render('cocktail/new.html.twig', [
@@ -132,4 +133,74 @@ class CocktailController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/mes-cocktails", name="cocktail.listUserCocktails")
+     * @return Response
+     */
+    public function listUserCoktails(CocktailRepository $cocktailRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $user = $this->getUser();
+        $cocktails = $cocktailRepository->findBy(['user' => $user], ['createdAt' => 'DESC']);
+
+        return $this->render('cocktail/list_user_cocktails.html.twig', [
+            'cocktails' => $cocktails
+        ]);
+    }
+
+    /**
+     * @Route("/cocktail-{slug}/delete", name="cocktail.delete")
+     * @return Response
+     */
+    public function delete(Cocktail $cocktail, CocktailUploaderHelper $uploaderHelper): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        if ($cocktail->getUser() != $this->getUser()) {
+            throw new AccessDeniedException('Access Denied.');
+        }
+
+        // Suppression du fichier image associé au cocktail
+        $uploaderHelper->removeCocktailImage($cocktail);
+
+        $this->manager->remove($cocktail);
+        $this->manager->flush();
+
+        $this->addFlash('success', 'Cocktail supprimé!');
+        return $this->redirectToRoute('cocktail.listUserCocktails');
+    }
+
+    /**
+     * @Route("/cocktail-{slug}/edit", name="cocktail.edit")
+     * @return Response
+     */
+    public function edit(Cocktail $cocktail, Request $request, SluggerInterface $slugger, CocktailUploaderHelper $uploaderHelper): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        if ($cocktail->getUser() != $this->getUser()) {
+            throw new AccessDeniedException('Access Denied.');
+        }
+
+        $form = $this->createForm(CocktailType::class, $cocktail);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $cocktail->setSlug($slugger->slug($cocktail->getName()));
+
+            // Gestion du fichier image par le service CocktailUploaderHelper
+            $uploaderHelper->uploadCocktailImage($form->get('imageFile')->getData(), $cocktail);
+
+            $this->manager->flush();
+
+            $this->addFlash('success', 'Votre cocktail a bien été modifié.');
+            return $this->redirectToRoute('cocktail.listUserCocktails');
+        }
+
+        return $this->render('cocktail/edit.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
 }

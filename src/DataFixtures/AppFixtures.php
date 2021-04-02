@@ -34,6 +34,11 @@ class AppFixtures extends Fixture
         $this->filesystem->remove($this->uploadsBaseDir);
 
         UserFactory::new()->createMany(20);
+        UserFactory::createOne([
+           'email' => 'admin@admin.com',
+           'password' => 'admin',
+           'roles' => ['ROLE_ADMIN']
+        ]);
 
         CategoryFactory::new()->createMany(10);
         CocktailFactory::new()->createMany(15);

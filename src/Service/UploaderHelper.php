@@ -4,6 +4,7 @@
 namespace App\Service;
 
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -12,10 +13,16 @@ class UploaderHelper
     private $uploadsBaseDir;
     private $uploadsBaseUrl;
 
-    public function __construct(string $uploadsBaseDir, string $uploadsBaseUrl)
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    public function __construct(string $uploadsBaseDir, string $uploadsBaseUrl, Filesystem $filesystem)
     {
         $this->uploadsBaseDir = $uploadsBaseDir;
         $this->uploadsBaseUrl = $uploadsBaseUrl;
+        $this->filesystem = $filesystem;
     }
 
     public function upload(File $file)
@@ -41,4 +48,13 @@ class UploaderHelper
         // Sinon on construit le chemin vers le fichier dans le dossier d'uploads
         return $this->uploadsBaseUrl . '/' . $path;
     }
+
+    public function remove(string $path)
+    {
+        $target = $this->uploadsBaseDir . '/' . $path;
+        if ($this->filesystem->exists($target)) {
+            $this->filesystem->remove($target);
+        }
+    }
+
 }

@@ -16,6 +16,14 @@
                         <a class="nav-link" href="{{ path('cocktail.new') }}">Créer votre cocktail !</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ path('cocktail.listUserCocktails') }}">Mes recettes</a>
+                    </li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('admin.index') }}">Administration</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ path('security.logout') }}">Déconnexion</a>
                     </li>
                 {% else %}

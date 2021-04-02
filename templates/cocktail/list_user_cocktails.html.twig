@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - Mes cocktails !{% endblock %}
+
+{% block body %}
+
+    <h2>Mes cocktails</h2>
+
+    <div class="row">
+        {% if cocktails %}
+            {% for cocktail in cocktails %}
+                <div class="mb-4 col-xl-3">
+                    <div class="card">
+                        {% if cocktail.image %}
+                            <img class="card-img-top" src="{{ asset_uploads(cocktail.image) }}" alt="{{ cocktail.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h3 class="card-title">{{ cocktail.name }}</h3>
+                            <span class="badge bg-secondary">{{ cocktail.category.label }}</span>
+                            <a href="{{ path('cocktail.index', {'slug':cocktail.slug}) }}" class="btn btn-primary">Voir la recette</a>
+                        </div>
+                        <div class="card-footer">
+                            <p class="text-muted">Ajouté le {{ cocktail.createdAt|date("d/m/Y") }}</p>
+                            <nav>
+                                <a href="{{ path('cocktail.edit', {'slug':cocktail.slug}) }}" class="btn btn-primary" title="Modifier"><i class="far fa-edit"></i></a>
+                                <a href="{{ path('cocktail.delete', {'slug':cocktail.slug}) }}" class="btn btn-danger" title="Supprimer"><i class="far fa-trash-alt"></i></a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="lead">Vous n'avez encore aucune recette ! <a href="{{ path('cocktail.new') }}">Créez votre premier cocktail !</a></p>
+        {% endif %}
+    </div>
+
+{% endblock %}

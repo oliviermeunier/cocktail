@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class CocktailType extends AbstractType
 {
@@ -37,7 +38,14 @@ class CocktailType extends AbstractType
             ->add('imageFile', FileType::class, [
                 'label' => 'Image',
                 'required' => false,
-                'mapped' => false
+                'mapped' => false,
+                'constraints' => [
+                    new Image([
+                        'maxSize' => '1M',
+                        'maxSizeMessage' => 'Le fichier image ne doit pas excéder {{ limit }} {{ suffix }}',
+                        'mimeTypesMessage' => 'Le type de fichier est incorrect (jpg, png, gif autorisés)'
+                    ])
+                ]
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer'
